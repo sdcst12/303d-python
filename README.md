@@ -2,82 +2,89 @@
 ### Assignment #xx (Total Marks xx)
 
 Objectives:
-* Write a query to search/select data from a table
+* Write a query to update information in a table
 
+Data is never static. Data changes. One of the important aspects of a database is the ability to change the contents of it.  For example, your bank keeps a record of how much money you have in your savings and loans accounts. These need to be regularly updated as you add/remove money.  Your Doctor needs to keep track of your contact information and send you emails to your current phone number or email address.  You really don't want those going to the wrong place!
 
-Once we have a database with information in the tables, the next thing to do is search the database and pull out all relevant information. Sometimes we may want to search for specific items, or order them in a specific way. We may also want to limit the number of results if there are too many.
-Often the results will be retrieved as a list or a list of lists.  It will depend on the Python commands we issue it.
+Today we will look at updating the information in a record.
+
 
 Step 1: Build your Query
 Structure:
 ```
-select _items_ from _table_ _options_
+UPDATE table_name
+SET column1 = value1, column2 = value2, ...
+WHERE condition;
 ```
-The keyword "select" tells us that we are looking for rows/records in a table.  We can choose which columns we select, or we can use the * to say we want all of the columns for the record.  Note that if we try to select a column that does not exist, our query will have an error.
+The keyword "update" tells us that we are going to modify the contents of a record or row.
+You can choose to update only some pieces of information in a record; you don't have to update all of the information.
+You do need to specific which record to update.  This is where having a primary key is really important.
 
-Consider the table created with the following command:
+Imagine that there are 2 people with the same name, which is entirely possible. Maybe James Smith occurs in your table twice, but they are 2 different people!  You only want to change the phone number for the James Smith that lives at  12345 Sesame Street, and not the one that lives at 999 Lucky Way.
+
+This is the process you might follow:
+1. List all of the James Smith's with their contact information
+2. Find the ID (or Customer ID Number) for the correct James Smith and remember it (store it in a variable)
+3. Update the phone number where the ID matches the correct James Smith
+
+Example:
+Consider the following results when you search for fname='James' and lname='Smith'
+
+table: customers
+ id  fname   lname   address                 phone               email
+ 93  James   Smith   12345 Sesame Street     6048331313          jsmith@gmail.com
+104  James   Smith   999 Lucky Way           6049879887          jamess@gmail.com
 
 ```
-create table if not exists customers (
-    id integer primary key autoincrement,
-    name tinytext,
-    email tinytext,
-    cnum int);
+update customers
+set phone=6048331212
+where id=93
 ```
-
-Some valid searches include the following:
-```
-select name from customers
-select name,cnum from customers
-select name from customers where cnum > 10
-select name from customers order by name asc
-select * from customers order by cnum desc
-select * from customers limit 20
-select * from customers where (cnum > 5 and (name like '%Be%' or name like '%Da'))
-```
-Note that in the last 5 commands, there are some options that have been included.
-These include:
-```
-where : like a conditional statement, only selects records that meet this criteria.  Note that you can use and/or operators and brackets for order of operations
-order by *** asc/desc : sorts the records into ascending or descending order by a specific column
-limit : sometimes there are a lot of results...Maybe you want to limit them to a smaller set.
-```
-Search results are retrieved and stored using the cursor.fetchall() or cursor.fetchone() commands, depending on wehther you want all results or a single record.  See the ex6.getRecords.py and sample.py files for some examples.
-
-Note: 
-
 
 Assignment:
-
-Answer the following questions about NPC's from the database. They are stored in a table called _npc_
-
-1. What is the structure of the table?  What are the columns and what datatypes do they store?
-2. How many records are in the table?
-3. How many Knights are in the table?
-4. Which class has the highest number of members?
-5. What is the ID number of the Jester with the most gold?
-6. What is the total gold of the 100 wealthiest npc's in the table?
-7. What is the total gold of the 100 wealthiest npc's under level 5?
-8. What is the stats of the Bard with the highest strength?
-9. What is the ID number of the npc with highest total sum of their 6 primary stats?
-10. What percentage of all fighter classes (Barbarian, Warrior, Knight, Samurai) are Warriors?
-11. What is the average hitpoints per level of the npc's that are level 10 or higher?
-
-Problem:
-Knights, Warriors, Barbarian, Samurai and Rangers have Strength as their Primary Stat
-Sages, Sorcerers, Bards and Jesters have Intelligence as their primary stat
-Thieves, Assassins and Monks have Dexterity as their primary stat
-Pirests have Wisdom as their primary stat
-
-Determine how many NPC's have chosen the wrong class based on their statistics:
-example:
-NPC 9906 has:
-str 5
-int 7
-wis 10
-dex 8
-con 6
-cha 5
-They have picked the correct class because their wisdom stat was the highest
+Create a database for a veterinarian.  You will need to create your own tables and choose the variable types that best suit these fields/columns.
+There will be 3 tables:
+customers
+    id : primary key integer
+    fname: first name 
+    lname: last name
+    phone: phone number
+    email: email address
+    address: phyiscal address
+    city: city where they live
+    postalcode: their postal code
 
 
+pets
+    id: primary key integer
+    name: pet name
+    type: dog or cat
+    breed: description of breed (example German Sheperd, Mixed, Persion)
+    birthdate: birthdate of pet (could be used to calculate their age)
+    ownerID: to match the ID number in customers ID
+
+visits
+    id: primary key integer
+    ownerid: the id of the owner who brought in their pet. Matches primary key of owner table
+    petid: the id of the pet that was brought in. Matches primary key of pets table
+    details: details what the visit was about.  Could be quite lengthy!
+    cost: how much was the visit
+    paid: how much has been paid so far, used to find outstanding debts
+
+
+Create a program that allows you to interface with this database. 
+We will be doing this in parts over the next few classes.
+
+Part 1.
+Create a function that will add a new customer.  
+Ask the user for their relevant details and add them to the customers table
+Optional enhancements.
+Ideas for Check for duplicates:
+* Check to see if there is already a username with the same phone number or email before adding and warn that the customer already exists
+* List all users with the same last name and ask for confirmation before adding
+
+Create a function that will allow you to search for a customer by any part of their record.
+Example: search for all customers with a specific last name
+Optional Enhancements.
+* search for all users that partially match a specific last name
+* search for multiple criteria
